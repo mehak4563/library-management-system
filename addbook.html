@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Student Library Management System</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-image: url(https://studentprojectguide.com/wp-content/uploads/2019/09/Library-management-system-synopsis-1024x683.jpg);
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+      margin: 0;
+      padding: 20px;
+    }
+    
+    
+    h1 {
+      color: #f6efef;
+      text-align: center;
+    }
+    
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background-color: #fff;
+      padding: 20px;
+      border: 1px solid #8cc6e1;
+    }
+    
+    .form-group {
+      margin-bottom: 10px;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+    }
+    
+    .form-group input {
+      width: 100%;
+      padding: 5px;
+      border: 1px solid #ccc;
+    }
+    
+    .form-group button {
+      width: 100%;
+      padding: 8px;
+      background-color: #4CAF50;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+    }
+    
+    table {
+      width: 100%;
+      margin-top: 20px;
+      border-collapse: collapse;
+    }
+    
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: left;
+    }
+
+    .issued {
+      color: red;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>Register</h1>
+
+  <div class="container">
+    <h2>Add Student</h2>
+    <form id="student-form">
+      <div class="form-group">
+        <label for="student-id">Student ID</label>
+        <input type="text" id="student-id" name="student-id" required>
+      </div>
+      <div class="form-group">
+        <label for="student-name">Student Name</label>
+        <input type="text" id="student-name" name="student-name" required>
+      </div>
+      <div class="form-group">
+        <label for="book-name">Book Name</label>
+        <input type="text" id="book-name" name="book-name" required>
+      </div>
+      <div class="form-group">
+        <button type="submit">Add Student</button>
+      </div>
+    </form>
+
+    <h2>Student List</h2>
+    <table id="student-list">
+      <tr>
+        <th>Student ID</th>
+        <th>Student Name</th>
+        <th>Book Name</th>
+        <th>Status</th>
+        <th>Action</th>
+      </tr>
+    </table>
+  </div>
+
+  <script>
+    var studentList = [];
+
+    function addStudent(studentID, studentName, bookName) {
+      var student = {
+        studentID: studentID,
+        studentName: studentName,
+        bookName: bookName,
+        issueDate: new Date()
+      };
+      studentList.push(student);
+      displayStudents();
+    }
+
+    function displayStudents() {
+      var studentTable = document.getElementById("student-list");
+      studentTable.innerHTML = "<tr><th>Student ID</th><th>Student Name</th><th>Book Name</th><th>Status</th><th>Action</th></tr>";
+
+      for (var i = 0; i < studentList.length; i++) {
+        var student = studentList[i];
+        var row = document.createElement("tr");
+        var studentIDCell = document.createElement("td");
+        var studentNameCell = document.createElement("td");
+        var bookNameCell = document.createElement("td");
+        var statusCell = document.createElement("td");
+        var actionCell = document.createElement("td");
+        var actionButton = document.createElement("button");
+
+        studentIDCell.textContent = student.studentID;
+        studentNameCell.textContent = student.studentName;
+        bookNameCell.textContent = student.bookName;
+        statusCell.textContent = isBookIssued(student) ? "Issued" : "Available";
+        statusCell.classList.add(isBookIssued(student) ? "issued" : "");
+        actionButton.textContent = isBookIssued(student) ? "Return" : "Issue";
+
+        actionButton.addEventListener("click", function(index) {
+          return function() {
+            toggleBookStatus(index);
+          };
+        }(i));
+
+        actionCell.appendChild(actionButton);
+        row.appendChild(studentIDCell);
+        row.appendChild(studentNameCell);
+        row.appendChild(bookNameCell);
+        row.appendChild(statusCell);
+        row.appendChild(actionCell);
+        studentTable.appendChild(row);
+      }
+    }
+
+    function isBookIssued(student) {
+      var currentDate = new Date();
+      var issueDate = student.issueDate;
+      var dueDate = new Date(issueDate.getFullYear(), issueDate.getMonth(), issueDate.getDate() + 30);
+      return currentDate <= dueDate;
+    }
+
+    function toggleBookStatus(index) {
+      var student = studentList[index];
+      student.issueDate = isBookIssued(student) ? null : new Date();
+      displayStudents();
+    }
+
+    document.getElementById("student-form").addEventListener("submit", function(event) {
+      event.preventDefault();
+      var studentID = document.getElementById("student-id").value;
+      var studentName = document.getElementById("student-name").value;
+      var bookName = document.getElementById("book-name").value;
+
+      addStudent(studentID, studentName, bookName);
+
+      // Clear input fields
+      document.getElementById("student-id").value = "";
+      document.getElementById("student-name").value = "";
+      document.getElementById("book-name").value = "";
+    });
+
+    displayStudents();
+  </script>
+</body>
+</html>
